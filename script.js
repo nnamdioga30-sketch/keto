@@ -35,12 +35,12 @@ generateBtn.addEventListener("click", async () => {
 
         message.textContent = "Video ready!";
 
-        if (data.downloadUrl) {
-            window.location.href = data.downloadUrl;
-        }
+const downloadBtn = document.createElement("a");
+downloadBtn.textContent = "Download Video";
+downloadBtn.href = data.url;
+downloadBtn.target = "_blank";
+downloadBtn.download = "KETO-video.mp4";
+downloadBtn.style.display = "inline-block";
+downloadBtn.style.marginTop = "15px";
 
-    } catch (error) {
-        console.error(error);
-        message.textContent = "Something went wrong. Try again.";
-    }
-});
+message.appendChild(downloadBtn);
