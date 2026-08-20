@@ -18,7 +18,6 @@ generateBtn.addEventListener("click", async () => {
     message.textContent = "Processing...";
 
     try {
-        // Backend will be connected here later
         const response = await fetch("https://keto-gold.vercel.app/api", {
             method: "POST",
             headers: {
@@ -35,12 +34,17 @@ generateBtn.addEventListener("click", async () => {
 
         message.textContent = "Video ready!";
 
-const downloadBtn = document.createElement("a");
-downloadBtn.textContent = "Download Video";
-downloadBtn.href = data.url;
-downloadBtn.target = "_blank";
-downloadBtn.download = "KETO-video.mp4";
-downloadBtn.style.display = "inline-block";
-downloadBtn.style.marginTop = "15px";
+        const downloadBtn = document.createElement("a");
+        downloadBtn.textContent = "Download Video";
+        downloadBtn.href = data.url;
+        downloadBtn.target = "_blank";
+        downloadBtn.download = "KETO-video.mp4";
+        downloadBtn.style.display = "inline-block";
+        downloadBtn.style.marginTop = "15px";
 
-message.appendChild(downloadBtn);
+        message.appendChild(downloadBtn);
+
+    } catch (error) {
+        message.textContent = error.message;
+    }
+});
