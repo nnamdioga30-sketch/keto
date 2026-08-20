@@ -15,12 +15,10 @@ generateBtn.addEventListener("click", async () => {
         return;
     }
 
-    generateBtn.disabled = true;
-    generateBtn.textContent = "Processing...";
     message.textContent = "Processing...";
 
     try {
-        const response = await fetch("https://keto-gold.vercel.app/api", {
+        const response = await fetch("/api/index", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -31,27 +29,14 @@ generateBtn.addEventListener("click", async () => {
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.error || "Download failed.");
+            throw new Error(data.error || "Something went wrong.");
         }
 
-        message.textContent = "Video ready!";
+        message.textContent = "TikTok link received successfully.";
 
-        if (data.url) {
-            const downloadBtn = document.createElement("a");
-            downloadBtn.textContent = "Download Video";
-            downloadBtn.href = data.url;
-            downloadBtn.target = "_blank";
-            downloadBtn.download = "KETO-video.mp4";
-            downloadBtn.style.display = "inline-block";
-            downloadBtn.style.marginTop = "15px";
-
-            message.appendChild(downloadBtn);
-        }
+        window.open(data.url, "_blank");
 
     } catch (error) {
         message.textContent = error.message;
-    } finally {
-        generateBtn.disabled = false;
-        generateBtn.textContent = "Generate";
     }
 });
