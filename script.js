@@ -15,6 +15,8 @@ generateBtn.addEventListener("click", async () => {
         return;
     }
 
+    generateBtn.disabled = true;
+    generateBtn.textContent = "Processing...";
     message.textContent = "Processing...";
 
     try {
@@ -23,7 +25,7 @@ generateBtn.addEventListener("click", async () => {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ url: url })
+            body: JSON.stringify({ url })
         });
 
         const data = await response.json();
@@ -34,17 +36,22 @@ generateBtn.addEventListener("click", async () => {
 
         message.textContent = "Video ready!";
 
-        const downloadBtn = document.createElement("a");
-        downloadBtn.textContent = "Download Video";
-        downloadBtn.href = data.url;
-        downloadBtn.target = "_blank";
-        downloadBtn.download = "KETO-video.mp4";
-        downloadBtn.style.display = "inline-block";
-        downloadBtn.style.marginTop = "15px";
+        if (data.url) {
+            const downloadBtn = document.createElement("a");
+            downloadBtn.textContent = "Download Video";
+            downloadBtn.href = data.url;
+            downloadBtn.target = "_blank";
+            downloadBtn.download = "KETO-video.mp4";
+            downloadBtn.style.display = "inline-block";
+            downloadBtn.style.marginTop = "15px";
 
-        message.appendChild(downloadBtn);
+            message.appendChild(downloadBtn);
+        }
 
     } catch (error) {
         message.textContent = error.message;
+    } finally {
+        generateBtn.disabled = false;
+        generateBtn.textContent = "Generate";
     }
 });
