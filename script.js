@@ -19,7 +19,7 @@ generateBtn.addEventListener("click", async () => {
 
     try {
         // Backend will be connected here later
-        const response = await fetch("/api/download", {
+        const response = await fetch("https://keto-gold.vercel.app/api", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
