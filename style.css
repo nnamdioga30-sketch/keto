@@ -1,71 +1,67 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+document.addEventListener('DOMContentLoaded', () => {
+  const generateBtn = document.getElementById('generateBtn');
+  const videoInput = document.getElementById('videoUrl');
+  const messageBox = document.getElementById('message');
 
-body {
-    font-family: Arial, sans-serif;
-    background: #000;
-    color: #fff;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+  if (!generateBtn || !videoInput) return;
 
-.container {
-    width: 90%;
-    max-width: 500px;
-    text-align: center;
-}
+  generateBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const url = videoInput.value.trim();
 
-.logo {
-    font-size: 42px;
-    font-weight: bold;
-    color: #ff1744;
-    margin-bottom: 20px;
-}
+    if (!url) {
+      if (messageBox) messageBox.textContent = 'Please paste a valid video link!';
+      return;
+    }
 
-h1 {
-    font-size: 30px;
-    margin-bottom: 10px;
-}
+    // Show processing state
+    generateBtn.disabled = true;
+    generateBtn.textContent = 'Loading...';
+    if (messageBox) messageBox.textContent = 'Processing video...';
 
-.subtitle {
-    color: #aaa;
-    margin-bottom: 30px;
-}
+    try {
+      const response = await fetch('/api', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ videoUrl: url })
+      });
 
-.download-box {
-    display: flex;
-    gap: 10px;
-}
+      const data = await response.json();
 
-#videoUrl {
-    flex: 1;
-    padding: 15px;
-    border: none;
-    border-radius: 8px;
-    outline: none;
-    font-size: 15px;
-}
+      if (!response.ok || !data.downloads) {
+        throw new Error(data.error || 'Failed to process video link.');
+      }
 
-#generateBtn {
-    padding: 15px 20px;
-    border: none;
-    border-radius: 8px;
-    background: #ff1744;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-}
+      // Clear message and display download buttons using matching CSS styles
+      if (messageBox) {
+        messageBox.innerHTML = '';
+        
+        data.downloads.forEach(item => {
+          const downloadBtn = document.createElement('a');
+          downloadBtn.href = item.url;
+          downloadBtn.target = '_blank';
+          downloadBtn.rel = 'noopener noreferrer';
+          downloadBtn.textContent = item.label;
+          
+          // Style download link matching your main red button theme
+          downloadBtn.style.display = 'block';
+          downloadBtn.style.marginTop = '15px';
+          downloadBtn.style.padding = '15px';
+          downloadBtn.style.background = '#ff1744';
+          downloadBtn.style.color = '#ffffff';
+          downloadBtn.style.fontWeight = 'bold';
+          downloadBtn.style.textDecoration = 'none';
+          downloadBtn.style.borderRadius = '8px';
+          
+          messageBox.appendChild(downloadBtn);
+        });
+      }
 
-#generateBtn:hover {
-    opacity: 0.85;
-}
-
-#message {
-    margin-top: 20px;
-    color: #aaa;
-}
+    } catch (err) {
+      if (messageBox) messageBox.textContent = 'Error: ' + err.message;
+    } finally {
+      generateBtn.disabled = false;
+      generateBtn.textContent = 'Generate';
+    }
+  });
+});
