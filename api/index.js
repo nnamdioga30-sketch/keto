@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // Handle CORS and preflight requests
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
@@ -10,18 +9,18 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed. Use POST.' });
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { videoUrl } = req.body;
+  let { videoUrl } = req.body;
 
-  if (!videoUrl) {
-    return res.status(400).json({ error: 'Please enter a valid video link.' });
+  if (!videoUrl || !videoUrl.includes('tiktok.com')) {
+    return res.status(400).json({ error: 'Please paste a valid TikTok link' });
   }
 
   try {
     const host = 'tiktok-downloader-no-watermark-scraper.p.rapidapi.com';
-    const apiUrl = `https://${host}/?url=${encodeURIComponent(videoUrl)}`;
+    const apiUrl = `https://${host}/?url=${encodeURIComponent(videoUrl.trim())}`;
 
     const response = await fetch(apiUrl, {
       method: 'GET',
@@ -34,26 +33,24 @@ export default async function handler(req, res) {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error('Failed to retrieve video details from API.');
+      throw new Error(data.message || 'API rejected the URL. Try a full desktop TikTok link.');
     }
 
-    // Extract the download URL returned by RapidAPI
     const downloadLink = data.url || data.video || data.play || data.download_url;
 
     if (!downloadLink) {
-      throw new Error('No downloadable video link found for this URL.');
+      throw new Error('Could not extract direct video URL from this link.');
     }
 
     return res.status(200).json({
       success: true,
       title: data.title || 'KETO Video',
       downloads: [
-        { label: 'Download HD', url: downloadLink, quality: 'HD' },
-        { label: 'Download Original', url: downloadLink, quality: 'Original' }
+        { label: 'Download Video', url: downloadLink }
       ]
     });
 
   } catch (error) {
-    return res.status(500).json({ error: error.message || 'Error processing video request.' });
+    return res.status(500).json({ error: error.message || 'Error processing TikTok link' });
   }
 }
