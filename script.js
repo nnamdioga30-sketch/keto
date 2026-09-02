@@ -15,6 +15,8 @@ generateBtn.addEventListener("click", async () => {
         return;
     }
 
+    generateBtn.disabled = true;
+    generateBtn.textContent = "Processing...";
     message.textContent = "Processing...";
 
     try {
@@ -32,11 +34,26 @@ generateBtn.addEventListener("click", async () => {
             throw new Error(data.error || "Something went wrong.");
         }
 
-        message.textContent = "TikTok link received successfully.";
+        if (!data.url) {
+            throw new Error("No download link was returned.");
+        }
 
-        window.open(data.url, "_blank");
+        message.textContent = "";
+
+        const downloadBtn = document.createElement("a");
+        downloadBtn.href = data.url;
+        downloadBtn.textContent = "Download Video";
+        downloadBtn.download = "KETO-video.mp4";
+
+        downloadBtn.style.display = "inline-block";
+        downloadBtn.style.marginTop = "15px";
+
+        message.appendChild(downloadBtn);
 
     } catch (error) {
         message.textContent = error.message;
+    } finally {
+        generateBtn.disabled = false;
+        generateBtn.textContent = "Generate";
     }
 });
